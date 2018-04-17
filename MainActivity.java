@@ -1,6 +1,7 @@
 package com.hard.trying.renka.cataloguemovie;
 
 import android.app.LoaderManager;
+import android.content.AsyncTaskLoader;
 import android.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,13 +33,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager
         adapter = new MovieAdapter(this);
         adapter.notifyDataSetChanged();
 
-        etMovieName = findViewById(R.id.et_movie_search);
-
-
         movieLV = findViewById(R.id.lv_movie);
+        movieLV.setAdapter(adapter);
 
-
-
+        etMovieName = findViewById(R.id.et_movie_search);
     }
 
     @Override
@@ -60,17 +58,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager
     }
 
     @Override
-    public Loader<ArrayList<MovieItem>> onCreateLoader(int id, Bundle args) {
-        return null;
+    public Loader<ArrayList<MovieItem>> onCreateLoader(int id, Bundle args)
+    {
+        if (args != null) {
+            String movieToSearch = args.getString(MOVIE_TO_SEARCH);
+
+            return new MovieAsyncLoader(this, movieToSearch);
+        }
+
+        return  null;
     }
 
     @Override
     public void onLoadFinished(Loader<ArrayList<MovieItem>> loader, ArrayList<MovieItem> data) {
-
+        adapter.setData(data);
     }
 
     @Override
     public void onLoaderReset(Loader<ArrayList<MovieItem>> loader) {
-
+        adapter.setData(null);
     }
 }
